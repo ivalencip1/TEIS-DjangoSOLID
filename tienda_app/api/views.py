@@ -45,3 +45,6 @@ class CompraAPIView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
         except Exception:
             return Response({'error': 'Error interno'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+    

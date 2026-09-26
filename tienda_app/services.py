@@ -5,6 +5,7 @@ from .domain.logic import CalculadorImpuestos
 from .models import Inventario, Libro
 
 
+
 class CompraService:
     """
     SERVICE LAYER: Orquesta la interacción entre el dominio,
@@ -45,3 +46,26 @@ class CompraService:
         inv.save()
 
         return orden.total
+
+class CompraRapidaService:
+
+    def __init__(self, procesador_pago):
+        self.procesador_pago = procesador_pago
+
+    def procesar(self, libro_id):
+        libro = Libro.objects.get(id=libro_id)
+        inv = Inventario.objects.get(libro=libro)
+
+        if inv.cantidad <= 0:
+            raise ValueError("No hay existencias.")
+
+        total = CalculadorImpuestos.obtener_total_con_iva(
+            libro.precio
+        )
+
+        if self.procesador_pago.pagar(total):
+            inv.cantidad -= 1
+            inv.save()
+            return total
+
+        return None
