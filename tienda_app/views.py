@@ -1,4 +1,3 @@
-
 from .infra.gateways import BancoNacionalProcesador
 from .services import CompraService, CompraRapidaService
 
@@ -112,16 +111,17 @@ def compra_rapida_fbv(request, libro_id):
 
 # 3. Versión mejorada: CBV + Service Layer
 
+
 class CompraRapidaView(View):
     template_name = 'tienda_app/compra_rapida.html'
 
     def get(self, request, libro_id):
-        servicio = CompraService(BancoNacionalProcesador())
+        servicio = CompraService(PaymentFactory.get_processor())
         contexto = servicio.obtener_detalle_producto(libro_id)
         return render(request, self.template_name, contexto)
 
     def post(self, request, libro_id):
-        servicio = CompraRapidaService(BancoNacionalProcesador())
+        servicio = CompraRapidaService(PaymentFactory.get_processor())
         try:
             total = servicio.procesar(libro_id)
             if total is None:

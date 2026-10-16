@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,10 +6,15 @@
     <title>Compra rápida</title>
 </head>
 <body>
-    <h1>Compra Rápida (Modo Spaghetti)</h1>
+    <h1>Compra Rápida</h1>
 
     <h2>{{ libro.titulo }}</h2>
+
     <p>Precio con IVA: ${{ total }}</p>
+
+    <p>
+        Stock actual: <strong>{{ stock_actual }}</strong> unidades
+    </p>
 
     <form method="post">
         {% csrf_token %}
@@ -17,3 +22,4 @@
     </form>
 </body>
 </html>
+```

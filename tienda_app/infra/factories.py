@@ -5,7 +5,7 @@ from .gateways import BancoNacionalProcesador
 
 class MockPaymentProcessor:
     def pagar(self, monto: float) -> bool:
-        print(f"[DEBUG] Mock Payment: Procesando pago de ${monto} sin cargo real.")
+        print(f"[DEBUG] Mock Payment: Procesando pago de ${monto:.2f} sin cargo real.")
         return True
 
 

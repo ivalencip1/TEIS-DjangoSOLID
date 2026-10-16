@@ -1,9 +1,9 @@
+
 from django.shortcuts import get_object_or_404
 
 from .domain.builders import OrdenBuilder
 from .domain.logic import CalculadorImpuestos
 from .models import Inventario, Libro
-
 
 
 class CompraService:
@@ -18,15 +18,31 @@ class CompraService:
 
     def obtener_detalle_producto(self, libro_id):
         libro = get_object_or_404(Libro, id=libro_id)
-        total = CalculadorImpuestos.obtener_total_con_iva(libro.precio)
-        return {"libro": libro, "total": total}
+        total = CalculadorImpuestos.obtener_total_con_iva(
+            libro.precio
+        )
+        inventario = get_object_or_404(Inventario, libro=libro)
 
-    def ejecutar_compra(self, libro_id, cantidad=1, direccion="", usuario=None):
+        return {
+            "libro": libro,
+            "total": total,
+            "stock_actual": inventario.cantidad,
+        }
+
+    def ejecutar_compra(
+        self,
+        libro_id,
+        cantidad=1,
+        direccion="",
+        usuario=None
+    ):
         libro = get_object_or_404(Libro, id=libro_id)
         inv = get_object_or_404(Inventario, libro=libro)
 
         if inv.cantidad < cantidad:
-            raise ValueError("No hay suficiente stock para completar la compra.")
+            raise ValueError(
+                "No hay suficiente stock para completar la compra."
+            )
 
         orden = (
             self.builder
@@ -38,14 +54,18 @@ class CompraService:
         )
 
         pago_exitoso = self.procesador_pago.pagar(orden.total)
+
         if not pago_exitoso:
             orden.delete()
-            raise Exception("La transacción fue rechazada por el banco.")
+            raise Exception(
+                "La transacción fue rechazada por el banco."
+            )
 
         inv.cantidad -= cantidad
         inv.save()
 
         return orden.total
+
 
 class CompraRapidaService:
 
